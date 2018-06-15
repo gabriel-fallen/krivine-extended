@@ -1,0 +1,20 @@
+name:                krivine-extended
+version:             0.1.0.0
+#synopsis:
+#description:
+homepage:            https://github.com/gabriel-fallen/krivine-extended#readme
+license:             BSD3
+author:              Alexander Tchitchigin
+maintainer:          sad.ronin@gmail.com
+copyright:           2018 Alexander Tchitchigin
+category:            Application
+extra-source-files:
+- README.md
+
+dependencies:
+  - base >= 4.7 && < 5
+
+executables:
+  extended:
+    source-dirs:      src
+    main:             Main.hs

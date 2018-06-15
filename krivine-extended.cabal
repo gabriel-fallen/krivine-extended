@@ -1,0 +1,30 @@
+-- This file has been generated from package.yaml by hpack version 0.28.2.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: a310e599bf78ed6b0ef61a5368b3addd772cb59d2c0f6b75b3ca78fb688754e2
+
+name:           krivine-extended
+version:        0.1.0.0
+category:       Application
+homepage:       https://github.com/gabriel-fallen/krivine-extended#readme
+author:         Alexander Tchitchigin
+maintainer:     sad.ronin@gmail.com
+copyright:      2018 Alexander Tchitchigin
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
+extra-source-files:
+    README.md
+
+executable extended
+  main-is: Main.hs
+  other-modules:
+      Lib
+      Paths_krivine_extended
+  hs-source-dirs:
+      src
+  build-depends:
+      base >=4.7 && <5
+  default-language: Haskell2010

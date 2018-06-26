@@ -1,11 +1,17 @@
+{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}
 module Lib where
+
+import Control.DeepSeq
+import Control.Parallel.Strategies
+import GHC.Generics (Generic)
+
 
 data Term
   = Var Int Int       -- <n, m> de Bruijn index variant
   | Lam Int Term      -- \x1 .. \xn -> term where term doesn't start with lambda
   | App Term [Term]
   | Free String
-  deriving (Eq)
+  deriving (Eq, Generic, NFData)
 
 instance Show Term where
   show (Var m n) = '<' : show m ++ ", " ++ show n ++ ">"
@@ -13,12 +19,13 @@ instance Show Term where
   show (App u v) = '(' : show u ++ ") " ++ show v
   show (Free n)  = n
 
+
 type Env = [[Closure]] -- Krivine environment is actually a list (stack) of lists of closures
   
 data Closure = Closure
   { getTerm :: Term
   , getEnv  :: Env
-  } deriving (Eq, Show)
+  } deriving (Eq, Show, Generic, NFData)
 
 type Stack = [Closure]
 
@@ -43,7 +50,7 @@ eval e s (Var n m) =
   Just (Closure t e') -> eval e' s t 
 
 -- the special case
-eval e s t@(Free _) = App t $ map (\c -> eval (getEnv c) [] $ getTerm c) s
+eval e s t@(Free _) = App t (map (\c -> eval (getEnv c) [] $ getTerm c) s `using` parList rdeepseq)
 
 
 fetch :: Env -> Int -> Int -> Maybe Closure

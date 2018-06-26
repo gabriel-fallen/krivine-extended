@@ -13,8 +13,17 @@ extra-source-files:
 
 dependencies:
   - base >= 4.7 && < 5
+  - deepseq
+  - parallel
+
+ghc-options: -O2 -rtsopts -threaded -with-rtsopts=-N
 
 executables:
   extended:
     source-dirs:      src
     main:             Main.hs
+
+# benchmarks:
+#   bench:
+#     source-dirs:      src
+#     main:             Main.hs

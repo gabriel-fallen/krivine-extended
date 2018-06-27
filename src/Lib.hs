@@ -30,15 +30,24 @@ data Closure = Closure
 type Stack = [Closure]
 
 
+-- | Adjust de Bruijn indexes when partially applying.
+shiftVars :: Int -> Int -> Term -> Term
+shiftVars l k (App t u) = App (shiftVars l k t) $ map (shiftVars l k) u
+shiftVars l k (Lam n t) = Lam n $ shiftVars (l + 1) k t
+shiftVars l k v@(Var l1 k1) = if l == l1 && k1 >= k then Var l (k1 - k) else v
+shiftVars _ _ t@(Free _) = t
+
+
 eval :: Env -> Stack -> Term -> Term
 eval e s (App t u) = eval e s' t
   where
     s' = map (\x -> Closure x e) u ++ s
 
 eval e s (Lam n t) =
-  if length s < n
+  let m = length s in
+  if m < n
     -- when lambda is applied to too few arguments leave lambda in place
-    then Lam n $ eval e' s' t -- FIXME: s' is always [] in this case
+    then Lam (n - m) $ shiftVars 0 m $ eval e' s' t -- FIXME: s' is always [] in this case
     else eval e' s' t
   where
     e' = cs : e
@@ -46,7 +55,7 @@ eval e s (Lam n t) =
 
 eval e s (Var n m) =
   case fetch e n m of
-  Nothing             -> Var n m
+  Nothing             -> App (Var n m) (map (\c -> eval (getEnv c) [] $ getTerm c) s `using` parList rdeepseq) -- FIXME: is this correct?
   Just (Closure t e') -> eval e' s t 
 
 -- the special case

@@ -91,7 +91,9 @@ main = do
   -- print r21
   -- print r21'
   -- print r5
+  print $ eval' $ App (Lam 2 $ App (Var 0 0) [Var 0 1]) [Free "z"]
+  print $ eval' $ App c2 [c2]
   -- print big
   -- print pair56
   -- pair57 `deepseq` putStrLn "Done."
-  klmn5766 `deepseq` putStrLn "Done."
+  -- klmn5766 `deepseq` putStrLn "Done."

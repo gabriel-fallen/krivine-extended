@@ -43,11 +43,11 @@ level (Env _ e) = level e
 
 
 eval :: Env -> Stack -> Term -> Term
-eval e s (App t u) = eval e s' t
+eval !e !s (App t u) = eval e s' t
   where
     s' = Closure u e : s
 
-eval e s v@(Lam t) = -- trace ("eval (" ++ show e ++ ") (" ++ show s ++ ") (" ++ show v ++ ")") $
+eval !e !s v@(Lam t) = -- trace ("eval (" ++ show e ++ ") (" ++ show s ++ ") (" ++ show v ++ ")") $
   if null s
     -- evaluate under lambda when not applied
     then Lam $ eval (Env (Closure (Var 0) Nil) $ Lift e) [] t
@@ -56,7 +56,7 @@ eval e s v@(Lam t) = -- trace ("eval (" ++ show e ++ ") (" ++ show s ++ ") (" ++
     e' = Env c e
     (c : s') = s
 
-eval e s v@(Var n) = -- trace ("eval (" ++ show e ++ ") (" ++ show s ++ ") (" ++ show v ++ ")") $
+eval !e !s v@(Var n) = -- trace ("eval (" ++ show e ++ ") (" ++ show s ++ ") (" ++ show v ++ ")") $
   -- trace ("Level = " ++ show (level e)) $
   case fetch e n of
   Nothing             -> case length s of
@@ -66,7 +66,7 @@ eval e s v@(Var n) = -- trace ("eval (" ++ show e ++ ") (" ++ show s ++ ") (" ++
   Just (Closure t e') -> eval e' s t 
 
 -- the special case
-eval e s t@(Free _) = if null s
+eval !e !s t@(Free _) = if null s
   then t
   else foldl' App t (map (\c -> eval (getEnv c) [] $ getTerm c) s `using` parList rdeepseq)
 

@@ -55,17 +55,17 @@ nmpair :: Int -> Int -> Term
 nmpair n m = App (App t $ u n) $ u m
   where
     -- t = \x.\y.((a)(x)y)(b)(y)x
-    t = Lam $ Lam $ App (App (Free "a") $ App (Var 0) (Var 1)) $ App (Free "b") $ App (Var 1) (Var 0)
+    t = Lam $ Lam $ App (App (Free "a") $ App (Var 1) (Var 0)) $ App (Free "b") $ App (Var 0) (Var 1)
     -- u k = \f.\z.(f)^{k}z -- Church numeral @k@
-    u k = Lam $ Lam $ iterate (App (Var 0)) (Var 1) !! k
+    u k = Lam $ Lam $ iterate (App (Var 1)) (Var 0) !! k
 
 klmn :: Int -> Int -> Int -> Int -> Term
 klmn k l m n = App (App (App (App t $ u k) $ u l) $ u m) $ u n
   where
     -- t = \x1.\x2.\x3.\x4.((((a)(x1)x2) (b)(x2)x1) (c)(x3)x4) (d)(x4)x3
-    t = Lam $ Lam $ Lam $ Lam $ foldl App (Free "a") [App (Var 0) (Var 1), App (Free "b") $ App (Var 1) (Var 0), App (Free "c") $ App (Var 2) (Var 3), App (Free "d") $ App (Var 3) (Var 2)]
+    t = Lam $ Lam $ Lam $ Lam $ foldl App (Free "a") [App (Var 3) (Var 2), App (Free "b") $ App (Var 2) (Var 3), App (Free "c") $ App (Var 1) (Var 0), App (Free "d") $ App (Var 0) (Var 1)]
     -- u k = \f.\z.(f)^{k}z -- Church numeral @k@
-    u k = Lam $ Lam $ iterate (App (Var 0)) (Var 1) !! k
+    u k = Lam $ Lam $ iterate (App (Var 1)) (Var 0) !! k
 
 
 main :: IO ()
@@ -79,8 +79,9 @@ main = do
       r21    = eval' add21
       r21'   = eval' add21'
       big    = eval' $ testt 15000 2000
-      pair57 = eval' $ nmpair 5 7
-      klmn5766 = eval' $ klmn 5 7 6 6
+      pair23 = eval' $ nmpair 2 3
+      pair88 = eval' $ nmpair 8 8
+      klmn8776 = eval' $ klmn 8 7 7 6
   -- print r1
   -- putStrLn $ if r1 == end then "pass" else "fail"
   -- print r2
@@ -91,9 +92,9 @@ main = do
   -- print r21
   -- print r21'
   -- print r5
-  print $ eval' $ App (Lam $ Lam $ App (Var 0) (Var 1)) (Free "z")
-  print $ eval' $ App c2 c2
+  -- print $ eval' $ App (Lam $ Lam $ App (Var 0) (Var 1)) (Free "z")
+  -- print $ eval' $ App c2 c2
   -- print big
-  -- print pair56
-  -- pair57 `deepseq` putStrLn "Done."
-  -- klmn5766 `deepseq` putStrLn "Done."
+  -- print pair23 -- for visual examination
+  -- pair88 `deepseq` putStrLn "Done."
+  klmn8776 `deepseq` putStrLn "Done."

@@ -5,72 +5,72 @@ import Lib
 
 
 term1 :: Term
-term1 = App (Lam 1 (Var 0 0)) [Free "end"]
+term1 = App (Lam (Var 0)) $ Free "end"
 
 term2 :: Term
-term2 = App (Lam 2 (Var 0 0)) [term1, Free "unused"]
+term2 = App (Lam $ App (Lam (Var 1)) (Free "unused")) term1
 
 term3 :: Term
-term3 = App (Lam 2 term1) [Free "unused1", Free "unused2"]
+term3 = App (App (Lam term1) (Free "unused1")) $ Free "unused2"
 
 term4 :: Term
-term4 = App (Lam 1 (App (Var 0 0) [Var 0 0])) [Free "z"]
+term4 = App (Lam (App (Var 0) $ Free "unused")) $ Free "z"
 
 -- An example from Daniel's paper
 term5 :: Term
-term5 = App (Lam 1 $ App (Var 0 0) [Var 0 0]) [Lam 1 (Var 0 0)]
+term5 = App (Lam $ App (Var 0) $ Var 0) $ Lam (Var 0)
 
 -- Church numerals
 c0 :: Term
-c0 = Lam 2 (Var 0 1)
+c0 = Lam $ Lam (Var 0)
 
 c1 :: Term
-c1 = Lam 2 (App (Var 0 0) [Var 0 1])
+c1 = Lam $ Lam (App (Var 1) $ Var 0)
 
 c2 :: Term
-c2 = Lam 2 (App (Var 0 0) [App (Var 0 0) [Var 0 1]])
+c2 = Lam $ Lam (App (Var 1) $ App (Var 1) $ Var 0)
 
 -- plus = \m n f x -> m f (n f x)
 plus :: Term
-plus = Lam 4 $ App (Var 0 0) [Var 0 2, App (Var 0 1) [Var 0 2, Var 0 3]]
+plus = Lam $ Lam $ Lam $ Lam $ App (App (Var 3) $ Var 1) $ App (App (Var 2) $ Var 1) $ Var 0
 
 add21 :: Term
-add21 = App plus [c2, c1, Lam 1 $ App (Free "1+") [Var 0 0], Free "0"]
+add21 = App (App (App (App plus c2) c1) (Lam $ App (Free "1+") $ Var 0)) $ Free "0"
 
 add21' :: Term
-add21' = App plus [c2, c1]
+add21' = App (App plus c2) c1
 
 -- Perf test with large expressions
 
 idt :: Term
-idt = Lam 1 $ Var 0 0
+idt = Lam $ Var 0
 
 nid :: Int -> Term
-nid = (!!) $ iterate (App idt . (: [])) (Free "x")
+nid = (!!) $ iterate (App idt) (Free "x")
 
 testt :: Int -> Int -> Term
-testt n m = App (Free "z") $ replicate m $ nid n
+testt n m = foldl App (Free "z") $ replicate m $ nid n
 
 nmpair :: Int -> Int -> Term
-nmpair n m = App t [u n, u m]
+nmpair n m = App (App t $ u n) $ u m
   where
     -- t = \x.\y.((a)(x)y)(b)(y)x
-    t = Lam 2 $ App (Free "a") [App (Var 0 0) [Var 0 1], App (Free "b") [App (Var 0 1) [Var 0 0]]]
+    t = Lam $ Lam $ App (App (Free "a") $ App (Var 0) (Var 1)) $ App (Free "b") $ App (Var 1) (Var 0)
     -- u k = \f.\z.(f)^{k}z -- Church numeral @k@
-    u k = Lam 2 $ iterate (App (Var 0 0) . (: [])) (Var 0 1) !! k
+    u k = Lam $ Lam $ iterate (App (Var 0)) (Var 1) !! k
 
 klmn :: Int -> Int -> Int -> Int -> Term
-klmn k l m n = App t [u k, u l, u m, u n]
+klmn k l m n = App (App (App (App t $ u k) $ u l) $ u m) $ u n
   where
     -- t = \x1.\x2.\x3.\x4.((((a)(x1)x2) (b)(x2)x1) (c)(x3)x4) (d)(x4)x3
-    t = Lam 4 $ App (Free "a") [App (Var 0 0) [Var 0 1], App (Free "b") [App (Var 0 1) [Var 0 0]], App (Free "c") [App (Var 0 2) [Var 0 3]], App (Free "d") [App (Var 0 3) [Var 0 2]]]
+    t = Lam $ Lam $ Lam $ Lam $ foldl App (Free "a") [App (Var 0) (Var 1), App (Free "b") $ App (Var 1) (Var 0), App (Free "c") $ App (Var 2) (Var 3), App (Free "d") $ App (Var 3) (Var 2)]
     -- u k = \f.\z.(f)^{k}z -- Church numeral @k@
-    u k = Lam 2 $ iterate (App (Var 0 0) . (: [])) (Var 0 1) !! k
-    
+    u k = Lam $ Lam $ iterate (App (Var 0)) (Var 1) !! k
+
 
 main :: IO ()
 main = do
-  let end    = App (Free "end") []
+  let end    = Free "end"
       r1     = eval' term1
       r2     = eval' term2
       r3     = eval' term3
@@ -91,8 +91,8 @@ main = do
   -- print r21
   -- print r21'
   -- print r5
-  print $ eval' $ App (Lam 2 $ App (Var 0 0) [Var 0 1]) [Free "z"]
-  print $ eval' $ App c2 [c2]
+  print $ eval' $ App (Lam $ Lam $ App (Var 0) (Var 1)) (Free "z")
+  print $ eval' $ App c2 c2
   -- print big
   -- print pair56
   -- pair57 `deepseq` putStrLn "Done."

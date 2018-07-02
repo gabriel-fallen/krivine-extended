@@ -58,7 +58,7 @@ eval e s v@(Lam n t) = trace ("eval (" ++ show e ++ ") (" ++ show s ++ ") (" ++ 
   let m = length s in
   if m < n
     -- when lambda is applied to too few arguments leave lambda in place
-    then Lam (n - m) $ shiftVars 0 m $ eval (Lift e') s' t -- FIXME: s' is always [] in this case
+    then Lam (n - m) $ shiftVars 0 m $ eval (Lift e) s' t -- FIXME: s' is always [] in this case
     else eval e' s' t
   where
     e' = Env cs e

@@ -51,13 +51,18 @@ nid = (!!) $ iterate (App idt) (Free "x")
 testt :: Int -> Int -> Term
 testt n m = foldl App (Free "z") $ replicate m $ nid n
 
+--
+
+church :: Int -> Term
+church k = Lam $ Lam $ iterate (App (Var 1)) (Var 0) !! k
+
 nmpair :: Int -> Int -> Term
 nmpair n m = App (App t $ u n) $ u m
   where
     -- t = \x.\y.((a)(x)y)(b)(y)x
     t = Lam $ Lam $ App (App (Free "a") $ App (Var 1) (Var 0)) $ App (Free "b") $ App (Var 0) (Var 1)
     -- u k = \f.\z.(f)^{k}z -- Church numeral @k@
-    u k = Lam $ Lam $ iterate (App (Var 1)) (Var 0) !! k
+    u = church
 
 klmn :: Int -> Int -> Int -> Int -> Term
 klmn k l m n = App (App (App (App t $ u k) $ u l) $ u m) $ u n
@@ -65,8 +70,13 @@ klmn k l m n = App (App (App (App t $ u k) $ u l) $ u m) $ u n
     -- t = \x1.\x2.\x3.\x4.((((a)(x1)x2) (b)(x2)x1) (c)(x3)x4) (d)(x4)x3
     t = Lam $ Lam $ Lam $ Lam $ foldl App (Free "a") [App (Var 3) (Var 2), App (Free "b") $ App (Var 2) (Var 3), App (Free "c") $ App (Var 1) (Var 0), App (Free "d") $ App (Var 0) (Var 1)]
     -- u k = \f.\z.(f)^{k}z -- Church numeral @k@
-    u k = Lam $ Lam $ iterate (App (Var 1)) (Var 0) !! k
+    u = church
 
+sixTuple :: Int -> Int -> Term
+sixTuple n m = App t u
+  where
+    t = Lam $ foldl App (Free "y") [Var 0, Var 0, Var 0, Var 0, Var 0, Var 0]
+    u = App (App (Free "x") $ App (church n) (church m)) $ App (church m) (church n)
 
 main :: IO ()
 main = do
@@ -82,6 +92,7 @@ main = do
       pair23 = eval' $ nmpair 2 3
       pair88 = eval' $ nmpair 8 8
       klmn8776 = eval' $ klmn 8 7 7 6
+      tuple86  = eval' $ sixTuple 8 6
   -- print r1
   -- putStrLn $ if r1 == end then "pass" else "fail"
   -- print r2
@@ -97,4 +108,6 @@ main = do
   -- print big
   -- print pair23 -- for visual examination
   -- pair88 `deepseq` putStrLn "Done."
-  klmn8776 `deepseq` putStrLn "Done."
+  -- klmn8776 `deepseq` putStrLn "Done."
+  -- print $ sixTuple 2 3
+  tuple86 `deepseq` putStrLn "Done."

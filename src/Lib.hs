@@ -23,14 +23,14 @@ instance Show Term where
 
   
 data Closure = Closure
-  { getTerm :: Term
-  , getEnv  :: Env
+  { getTerm :: !Term
+  , getEnv  :: !Env
   } deriving (Eq, Show, Generic, NFData)
 
 data Env
   = Nil
-  | Lift Env
-  | Env Closure Env
+  | Lift !Env
+  | Env !Closure !Env
   deriving (Eq, Show, Generic, NFData)
 
 type Stack = [Closure]
@@ -50,11 +50,12 @@ eval !e !s (App t u) = eval e s' t
 eval !e !s v@(Lam t) = -- trace ("eval (" ++ show e ++ ") (" ++ show s ++ ") (" ++ show v ++ ")") $
   if null s
     -- evaluate under lambda when not applied
-    then Lam $ eval (Env (Closure (Var 0) Nil) $ Lift e) [] t
+    then Lam $ eval (Env nilClosure $ Lift e) [] t
     else eval e' s' t
   where
     e' = Env c e
     (c : s') = s
+    nilClosure = Closure (Var 0) Nil
 
 eval !e !s v@(Var n) = -- trace ("eval (" ++ show e ++ ") (" ++ show s ++ ") (" ++ show v ++ ")") $
   -- trace ("Level = " ++ show (level e)) $

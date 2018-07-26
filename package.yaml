@@ -16,7 +16,7 @@ dependencies:
   - deepseq
   - parallel
 
-ghc-options: -O2 -rtsopts -threaded -with-rtsopts=-N
+ghc-options: -O2 -rtsopts -threaded -with-rtsopts=-N -fno-prof-count-entries -eventlog
 
 executables:
   extended:

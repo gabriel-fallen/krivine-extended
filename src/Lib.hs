@@ -21,6 +21,12 @@ instance Show Term where
   show (App u v) = '(' : show u ++ ") " ++ show v
   show (Free n)  = n
 
+size :: Term -> Integer
+size (Var _)   = 1
+size (Lam t)   = 1 + size t
+size (App u v) = 1 + size u + size v
+size (Free _)  = 1
+
   
 data Closure = Closure
   { getTerm :: !Term

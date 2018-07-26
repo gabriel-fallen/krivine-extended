@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: d160341675b1544a464a29764a7dbd1ee39fddd0b734385284878ddc1453c392
+-- hash: bbd30a36925072562658c1138ed5f7979442d6821e20fc98a1a543e671bd468a
 
 name:           krivine-extended
 version:        0.1.0.0
@@ -25,7 +25,7 @@ executable extended
       Paths_krivine_extended
   hs-source-dirs:
       src
-  ghc-options: -O2 -rtsopts -threaded -with-rtsopts=-N
+  ghc-options: -O2 -rtsopts -threaded -with-rtsopts=-N -fno-prof-count-entries -eventlog
   build-depends:
       base >=4.7 && <5
     , deepseq

@@ -15,6 +15,17 @@ data Term
   | Free !String
   deriving (Eq, Generic, NFData)
 
+-- Cached objects to save memory
+var0, var1 :: Term
+var0 = Var 0
+var1 = Var 1
+
+-- "Smart constructor"
+mkVar :: Int -> Term
+mkVar 0 = var0
+mkVar 1 = var1
+mkVar n = Var n
+
 instance Show Term where
   show (Var n)   = '<' : show n ++ ">"
   show (Lam t)   = "λ. " ++ show t
@@ -61,15 +72,15 @@ eval !e !s v@(Lam t) = -- trace ("eval (" ++ show e ++ ") (" ++ show s ++ ") (" 
   where
     e' = Env c e
     (c : s') = s
-    nilClosure = Closure (Var 0) Nil
+    nilClosure = Closure var0 Nil
 
 eval !e !s v@(Var n) = -- trace ("eval (" ++ show e ++ ") (" ++ show s ++ ") (" ++ show v ++ ")") $
   -- trace ("Level = " ++ show (level e)) $
   case fetch e n of
   Nothing             -> case length s of
-    0 -> Var (n + level e) -- no application
-    1 -> App (Var $ n + level e) $ let c = head s in eval (getEnv c) [] $ getTerm c -- no parallelism
-    _ -> foldl' App (Var $ n + level e) (map (\c -> eval (getEnv c) [] $ getTerm c) s `using` parList rdeepseq) -- FIXME: is this correct?
+    0 -> mkVar (n + level e) -- no application
+    1 -> App (mkVar $ n + level e) $ let c = head s in eval (getEnv c) [] $ getTerm c -- no parallelism
+    _ -> foldl' App (mkVar $ n + level e) (map (\c -> eval (getEnv c) [] $ getTerm c) s `using` parList rdeepseq) -- FIXME: is this correct?
   Just (Closure t e') -> eval e' s t 
 
 -- the special case

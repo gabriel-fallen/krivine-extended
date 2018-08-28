@@ -93,7 +93,7 @@ main = do
       big    = eval' $ testt 15000 2000
       pair23 = eval' $ nmpair 2 3
       pair76 = eval' $ nmpair 7 6
-      klmn8776 = eval' $ klmn 8 7 7 6
+      klmn8796 = eval' $ klmn 8 7 9 6
       klmn6776 = eval' $ klmn 6 7 7 6
       tuple86  = eval' $ sixTuple 9 6
   -- print r1
@@ -111,7 +111,7 @@ main = do
   -- print big
   -- print pair23 -- for visual examination
   -- pair76 `deepseq` putStrLn "Done."
-  klmn8776 `deepseq` putStrLn "Done."
+  klmn8796 `deepseq` putStrLn "Done."
   -- klmn6776 `deepseq` putStrLn "Done."
   -- print $ sixTuple 2 3
   -- tuple86 `deepseq` putStrLn "Done."

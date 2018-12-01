@@ -2,6 +2,7 @@ module Main where
 
 import Control.DeepSeq
 import Lib
+import Parser
 
 
 term1 :: Term
@@ -79,6 +80,11 @@ sixTuple n m = App t u
 
 -- ((x)((\\(((2)\\(1)2)\\\(2)1)((1)\\(1)2)\\\1)(y1)y2)(y3)y4)((\\(((2)\\(1)2)\\\(2)1)((1)\\(1)2)\\\1)(y5)y6)(y7)y8
 
+parse :: String -> String
+parse = either id show . parseDeBruijnString
+
+evaluate :: String -> String
+evaluate = either id (show . eval') . parseDeBruijnString
 
 main :: IO ()
 main = do
@@ -111,7 +117,8 @@ main = do
   -- print big
   -- print pair23 -- for visual examination
   -- pair76 `deepseq` putStrLn "Done."
-  klmn8796 `deepseq` putStrLn "Done."
+  -- klmn8796 `deepseq` putStrLn "Done."
   -- klmn6776 `deepseq` putStrLn "Done."
   -- print $ sixTuple 2 3
   -- tuple86 `deepseq` putStrLn "Done."
+  interact parse

@@ -12,7 +12,9 @@ extra-source-files:
 - README.md
 
 dependencies:
+  - attoparsec
   - base >= 4.7 && < 5
+  - bytestring
   - deepseq
   - parallel
 

@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: bbd30a36925072562658c1138ed5f7979442d6821e20fc98a1a543e671bd468a
+-- hash: 58269b7bbf0f5e6c6496735f5dd6db74427344b4105678b9e9cd4d43c1ce288d
 
 name:           krivine-extended
 version:        0.1.0.0
@@ -22,12 +22,15 @@ executable extended
   main-is: Main.hs
   other-modules:
       Lib
+      Parser
       Paths_krivine_extended
   hs-source-dirs:
       src
   ghc-options: -O2 -rtsopts -threaded -with-rtsopts=-N -fno-prof-count-entries -eventlog
   build-depends:
-      base >=4.7 && <5
+      attoparsec
+    , base >=4.7 && <5
+    , bytestring
     , deepseq
     , parallel
   default-language: Haskell2010

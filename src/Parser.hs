@@ -5,9 +5,8 @@ module Parser
 
 import Data.Attoparsec.ByteString.Char8
 import Data.ByteString (ByteString)
-import Data.ByteString.Char8 (pack, unpack)
+import Data.ByteString.Char8 (pack)
 import Data.Foldable
-import Data.Word (Word8)
 
 import Lib
 
@@ -36,17 +35,7 @@ lam :: Parser Term
 lam = spaces *> lambda *> (Lam <$> term)
 
 app :: Parser Term
-app = do
-  spaces
-  lparen
-  spaces
-  left <- term
-  spaces
-  rparen
-  spaces
-  right <- term
-  pure $ App left right
-
+app = App <$> (spaces *> lparen *> spaces *> term <* spaces <* rparen) <*> (spaces *> term)
 
 term :: Parser Term
 term = choice [app, lam, var, free]
